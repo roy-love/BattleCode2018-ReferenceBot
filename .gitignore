@@ -2,3 +2,7 @@ working_dir
 replay*
 viewer_latest*
 viewer_currentInstall.json
+.DS_Store
+.pyc
+.log
+battlecode/python/battlecode/__pycache__/__init__.cpython-36.pyc
