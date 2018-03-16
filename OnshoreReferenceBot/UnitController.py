@@ -135,7 +135,7 @@ class UnitController:
         #robot specific mission assignment.
         #structures create their own build missions
 
-        if self.game_controller.is_rocket_researched() and self.rocketCount == 0 and \
+        if self.is_rocket_researched() and self.rocketCount == 0 and \
              self.game_controller.karbonite() > bc.UnitType.Rocket.blueprint_cost():
                 #if self.game_controller.round() > 95 and self.game_controller.round() < 101:
             robot = random.choice(self.robots)
@@ -162,3 +162,11 @@ class UnitController:
         #print("robot count: {}".format(robot_count))
         for robot in self.robots:
             robot.run()
+
+    def is_rocket_researched(self):
+        research_info = self.game_controller.research_info()
+        level = research_info.get_level(bc.UnitType.Rocket)
+        if level > 0:
+            return True
+        else:
+            return False

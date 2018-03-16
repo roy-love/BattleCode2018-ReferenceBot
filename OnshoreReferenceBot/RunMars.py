@@ -6,6 +6,7 @@ import traceback
 from MapController import MapController
 from PathfindingController import PathfindingController
 from UnitController import UnitController
+from MissionController import MissionController
 
 
 class RunMars:
@@ -24,9 +25,8 @@ class RunMars:
         # self.build_controller = BuildController(gameController, self.map_controller, \
         # self.strategy_controller)
         self.pathfinding_controller = PathfindingController(gameController, self.map_controller)
-        # self.mission_controller = MissionController(gameController, self.strategy_controller, \
-        # self.map_controller, self.research_tree_controller)
-        self.unit_controller = UnitController(gameController, self.pathfinding_controller,  self.map_controller)
+        self.mission_controller = MissionController(gameController, self.map_controller)
+        self.unit_controller = UnitController(gameController, self.pathfinding_controller, self.mission_controller, self.map_controller)
         # self.targetting_controller = TargettingController(gameController, \
         # self.map_controller, self.strategy_controller, self.unit_controller, self.enemy_tracking_controller)
 

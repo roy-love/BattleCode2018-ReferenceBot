@@ -4,7 +4,6 @@ import traceback
 
 import battlecode as bc
 from enum import Enum
-from .StrategyController import *
 
 
 class Missions(Enum):
@@ -53,11 +52,10 @@ class MissionInfo:
 # Controller that handles the creation and managment of missions
 class MissionController:
     """This is the mission controller"""
-    def __init__(self, gameController, strategyController, mapController, researchTreeController):
+    def __init__(self, gameController, mapController):
         self.game_controller = gameController
-        self.strategy_controller = strategyController
         self.map_controller = mapController
-        self.researchTreeController = researchTreeController
+        # self.researchTreeController = researchTreeController
 
         self.combat_missions = []
         self.healer_missions = []
@@ -98,12 +96,12 @@ class MissionController:
                 return self.worker_missions.pop(0)
             else:
                 return self.__create_new_worker_mission__()
-        elif unit_type == bc.UnitType.Healer:
-            if len(self.healer_missions) > 0:
-                print("Healer mission assigned")
-                return self.healer_missions.pop(0)
-            else:
-                return self.__create_new_healer_mission__()
+        # elif unit_type == bc.UnitType.Healer:
+        #     if len(self.healer_missions) > 0:
+        #         print("Healer mission assigned")
+        #         return self.healer_missions.pop(0)
+        #     else:
+        #         return self.__create_new_healer_mission__()
         elif unit_type == bc.UnitType.Factory:
             if len(self.factory_missions) > 0:
                 print("Factory mission assigned")
@@ -170,7 +168,7 @@ class MissionController:
 
     def __create_new_worker_mission__(self):
         #Determine what mission to assign based on the current strategy
-        if self.strategy_controller.unitStrategy == UnitStrategies.Default:
+        if True: #self.strategy_controller.unitStrategy == UnitStrategies.Default:
 
             #Mine Karbonite
             new_mission = Mission()
@@ -181,29 +179,29 @@ class MissionController:
             new_mission.info = map_location # TODO get mining location from map
             return new_mission
 
-    def __create_new_healer_mission__(self):
+    # def __create_new_healer_mission__(self):
 
-        if self.strategy_controller.unitStrategy == UnitStrategies.Default:
-            chance = random.randint(0, 100)
-            if chance > 50:
-                if len(self.game_controller.my_units()) > 1:
-                    new_mission = Mission()
-                    new_mission.action = Missions.FollowUnit
-                    new_mission.info = self.game_controller.my_units()[0]
-                    # TODO creat logic for aquiring a target to follow
-                    return Missions.FollowUnit
-                else:
-                    new_mission = Mission()
-                    new_mission.action = Missions.Idle
-                    return new_mission
-            else:
-                new_mission = Mission()
-                new_mission.action = Missions.Idle
-                return new_mission
+    #     if self.strategy_controller.unitStrategy == UnitStrategies.Default:
+    #         chance = random.randint(0, 100)
+    #         if chance > 50:
+    #             if len(self.game_controller.my_units()) > 1:
+    #                 new_mission = Mission()
+    #                 new_mission.action = Missions.FollowUnit
+    #                 new_mission.info = self.game_controller.my_units()[0]
+    #                 # TODO creat logic for aquiring a target to follow
+    #                 return Missions.FollowUnit
+    #             else:
+    #                 new_mission = Mission()
+    #                 new_mission.action = Missions.Idle
+    #                 return new_mission
+    #         else:
+    #             new_mission = Mission()
+    #             new_mission.action = Missions.Idle
+    #             return new_mission
 
     def __create_new_combat_mission__(self):
 
-        if self.strategy_controller.unitStrategy == UnitStrategies.Default:
+        if True:
             chance = random.randint(1, 100)
             if chance > 0:
                 new_mission = Mission()
@@ -226,7 +224,7 @@ class MissionController:
 
     def __create_new_factory_mission__(self):
         production_chance = None
-        if self.strategy_controller.unitStrategy == UnitStrategies.Default:
+        if True:
             production_chance = [50, 0, 40, 20, 0] # Workers and Knights
             #production_chance = [80, 60, 40, 20, 0]
             #Balanced production chance
@@ -265,7 +263,7 @@ class MissionController:
 
     def __create_new_rocket_mission__(self):
     
-        if self.strategy_controller.unitStrategy == UnitStrategies.Default:
+        if True:
             chance = random.randint(1, 100)
             if chance > 0:
                 new_mission = Mission()
