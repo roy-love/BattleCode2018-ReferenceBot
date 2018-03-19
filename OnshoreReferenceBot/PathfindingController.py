@@ -18,9 +18,11 @@ class PathfindingController:
 		self.gameController = gameController
 		self.mapController = mapController
 		#Possible directions, only using 4 to make it alittle simpler
-		self.Directions = [bc.Direction.North, bc.Direction.East, bc.Direction.South, bc.Direction.West]
+		self.Directions = [bc.Direction.North, bc.Direction.East, bc.Direction.South, bc.Direction.West , bc.Direction.Northeast, \
+		bc.Direction.Southeast, bc.Direction.Northwest, bc.Direction.Southwest]
 		#The nodes that are blocked either by map obstacles 
 		self.earthBlockedNodes = []
+		self.blockedLocations = []
 
 	def FindPathTo(self, planet, currentLocation, destination):
 		#First step is to find all of the blocked nodes on the map
@@ -40,14 +42,11 @@ class PathfindingController:
 		#creates the ending GraphNode
 		endNode = GraphNode(endingLocation, None, None)
 		#Create the list of nodes that will be blocked by units
-		blockedLocations = []
+		# blockedLocations = []
 		#Get all visible units on the map
 		units = self.gameController.units()
 		#Interate through the units
-		for unit in units:
-			unitMapLoc = unit.location.map_location()
-			#Added nodes with units to the list of blocked nodes
-			blockedLocations.append(self.mapController.GetNode(unitMapLoc.planet, unitMapLoc.x, unitMapLoc.y))
+		self.PopulateBlockedLocations()
 		#add the starting node to the frontier so we know where to start from
 		frontier.append(node)
 		while True:
@@ -71,7 +70,7 @@ class PathfindingController:
 					#check if it is already in the frontier if so do nothing
 					if self.AlreadyFrontier(nodes, frontier):
 						#check if node is open
-						if self.IsNodeOpen(nodes, blockedLocations):
+						if self.IsNodeOpen(nodes):
 							#if the node is not explored, in the frontier, or blocked add it to the frontier
 							frontier.append(nodes)
 			#If the current node is the room we are looking for break out we are done
@@ -114,6 +113,14 @@ class PathfindingController:
 			newNode = self.mapController.GetNode(planet, currentnode.room["x"], currentnode.room["y"] - 1)
 		elif direction == bc.Direction.West:
 			newNode = self.mapController.GetNode(planet, currentnode.room["x"] - 1, currentnode.room["y"])
+		elif direction == bc.Direction.Northwest:
+			newNode = self.mapController.GetNode(planet, currentnode.room["x"] - 1, currentnode.room["y"] + 1)
+		elif direction == bc.Direction.Southwest:
+			newNode = self.mapController.GetNode(planet, currentnode.room["x"] - 1, currentnode.room["y"] - 1)
+		elif direction == bc.Direction.Northeast:
+			newNode = self.mapController.GetNode(planet, currentnode.room["x"] + 1, currentnode.room["y"] + 1)
+		elif direction == bc.Direction.Southeast:
+			newNode = self.mapController.GetNode(planet, currentnode.room["x"] + 1, currentnode.room["y"] - 1)
 		newRoom = None
 		#if the node exist create a new Graphnode with the node, its parent node, and the action we took to get here
 		if (newNode is not None):
@@ -139,7 +146,7 @@ class PathfindingController:
 				break
 		return notInFrontier
 
-	def IsNodeOpen(self, node, blockedLocations):
+	def IsNodeOpen(self, node):
 		#default node is open to true
 		nodeOpen = True
 		#interate through the nodes that are blocked on the map
@@ -148,7 +155,7 @@ class PathfindingController:
 			if node.room["hash"]  == nodes["hash"] :
 				#if the node is in the earthblockednodes return false because it a blocked node
 				return False
-		for nodes in blockedLocations:
+		for nodes in self.blockedLocations:
 			#if the node is in the blocked locations return false because the node is currently blocked by a robot or structure
 			if node.room["hash"] == nodes["hash"] :
 				return False
@@ -166,3 +173,25 @@ class PathfindingController:
 					blockedNodes.append(node)
 		#return the list of blocked nodes
 		return blockedNodes
+
+	def PopulateBlockedLocations(self):
+		self.blockedLocations = []
+		#Get all visible units on the map
+		units = self.gameController.units()
+		for unit in units:
+			unitMapLoc = unit.location.map_location()
+			#Added nodes with units to the list of blocked nodes
+			self.blockedLocations.append(self.mapController.GetNode(unitMapLoc.planet, unitMapLoc.x, unitMapLoc.y))
+
+	def GetOpenNodeNextToMe(self, currentLocation, planet):
+		currentNode = self.mapController.GetNode(planet, currentLocation.x, currentLocation.y)
+		node = GraphNode(currentNode, None, None)
+		# Get all surrounding nodes
+		newNodes = self.Explore(planet, node)
+		# Go through nodes and find the first open node
+		for node in newNodes:
+			if self.IsNodeOpen(node):
+				return node
+		return None
+
+		

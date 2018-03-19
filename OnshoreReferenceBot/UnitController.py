@@ -31,13 +31,6 @@ class UnitController:
         self.__delete_killed_units()
         self.__add_unregistered_units()
         
-        
-
-        
-        
-
-        
-
     def UpdateRobotCounts(self):
         self.workerCount = 0
         for robot in self.robots:

@@ -52,6 +52,7 @@ class RunEarth:
 
         else:
             print("Round {}".format(self.round))
+            print("Processing Left {}".format(self.game_controller.get_time_left_ms()))
 
         #print("Update research queue")
         # self.research_tree_controller.update_queue()

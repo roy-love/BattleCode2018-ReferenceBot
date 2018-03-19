@@ -109,3 +109,4 @@ class MapController:
                   node = self.mars_map[mapX][mapY]
                   return node
             return None
+

@@ -10,20 +10,20 @@ class Worker(IRobot):
     """This is the Worker robot"""
     # change init definition to include any controllers needed in the instructor as we need them
     # For example:  it will eventually need to access the Targeting and Pathfinding controllers
-    def __init__(self, gameController, unitController, \
-    pathfindingController, missionController, unit,mapController):
-        super().__init__(gameController, unitController, \
-        pathfindingController, missionController, unit, bc.UnitType.Worker,mapController)
+    def __init__(self, gameController, unitController, pathfindingController, missionController, unit, mapController):
+        super().__init__(gameController, unitController, pathfindingController, missionController, unit, bc.UnitType.Worker, mapController)
     
 
     #overrides IRobot run method
     def run(self):
         if not self.unit.location.is_in_garrison() and not self.unit.location.is_in_space():
-            
             if self.unit_controller.workerCount < 10:
-                direction = random.choice(self.directions)
-                if self.game_controller.can_replicate(self.unit.id, direction):
-                    self.try_replication(direction)
+                openNode = self.pathfinding_controller.GetOpenNodeNextToMe(self.unit.location.map_location(), \
+                self.unit.location.map_location().planet) #random.choice(self.directions)
+                if openNode is not None:
+                    direction = openNode.Action
+                    if self.game_controller.can_replicate(self.unit.id, direction):
+                        self.try_replication(direction)
             
             #print("Worker bot with id {} run() called.".format(self.unit.id))
             self.update_mission()

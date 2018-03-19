@@ -23,7 +23,7 @@ class Rocket(IStructure):
             team = self.game_controller.team()
             robots = self.game_controller.sense_nearby_units_by_team(self.unit.location.map_location(),2,team)
             for robot in robots:
-                print("Rocket cycle robot: {}".format(robot))
+                print("Rocket cycle robot: {}".format(robot.id))
                 #unit = self.game_controller.unit(robot)
                 if robot.unit_type != bc.UnitType.Factory and robot.unit_type != bc.UnitType.Rocket:
                     if self.try_load(robot.id):

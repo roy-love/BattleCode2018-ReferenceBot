@@ -1,9 +1,11 @@
 import random
 import sys
 import traceback
+
 import battlecode as bc
-from MissionController import *
 from IStructure import IStructure
+from MissionController import *
+
 
 class Factory(IStructure):
     """This is the factory"""
