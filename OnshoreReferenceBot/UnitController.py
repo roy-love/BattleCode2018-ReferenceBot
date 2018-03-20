@@ -104,7 +104,7 @@ class UnitController:
         #     self.robots.append(Mage(self.game_controller, \
         #     self, self.pathfinding_controller, unit, self.mapController))
         if unit.unit_type == bc.UnitType.Ranger:
-            self.robots.append(Ranger(self.game_controller, self.pathfinding_controller, self.mission_controller, unit, self.mapController))
+            self.robots.append(Ranger(self.game_controller, self, self.pathfinding_controller, self.mission_controller, unit, self.mapController))
         elif unit.unit_type == bc.UnitType.Worker:
             self.robots.append(Worker(self.game_controller, self, self.pathfinding_controller, self.mission_controller, unit, self.mapController))
 
@@ -135,13 +135,18 @@ class UnitController:
         #print("Running all structures")
         #print("structures count: {}".format(structure_count))
         for structure in self.structures:
-            structure.run()
+            try:
+                structure.run()
+            except:
+                print("ran into errors running structures")
 
         #print("Running all robots")
         #print("robot count: {}".format(robot_count))
         for robot in self.robots:
-            robot.run()
-
+            try:
+                robot.run()
+            except:
+                print("ran into errors running robots")
     def is_rocket_researched(self):
         research_info = self.game_controller.research_info()
         level = research_info.get_level(bc.UnitType.Rocket)

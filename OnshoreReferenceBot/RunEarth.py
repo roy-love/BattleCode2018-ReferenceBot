@@ -61,4 +61,7 @@ class RunEarth:
         self.unit_controller.update_units()
 
         #print("Running all units")
-        self.unit_controller.run_units()
+        try:
+            self.unit_controller.run_units()
+        except:
+            print("ran into error while running units")

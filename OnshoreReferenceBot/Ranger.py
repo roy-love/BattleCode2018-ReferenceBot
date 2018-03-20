@@ -9,8 +9,8 @@ class Ranger(IRobot):
 	"""This is the Ranger robot"""
 	# change init definition to include any controllers needed in the instructor as we need them
 	# For example:  it will eventually need to access the Targeting and Pathfinding controllers
-	def __init__(self, gameController, pathfindingController, missionController, unit, mapController):
-		super().__init__(gameController, pathfindingController, missionController, unit, bc.UnitType.Ranger, mapController)
+	def __init__(self, gameController, unit_controller, pathfindingController, missionController, unit, mapController):
+		super().__init__(gameController, unit_controller, pathfindingController, missionController, unit, bc.UnitType.Ranger, mapController)
 
 	def run(self):
 		if not self.unit.location.is_in_garrison() and not self.unit.location.is_in_space():

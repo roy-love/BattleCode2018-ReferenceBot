@@ -17,7 +17,7 @@ class Worker(IRobot):
     #overrides IRobot run method
     def run(self):
         if not self.unit.location.is_in_garrison() and not self.unit.location.is_in_space():
-            if self.unit_controller.workerCount < 10:
+            if self.unit_controller.workerCount < 20:
                 openNode = self.pathfinding_controller.GetOpenNodeNextToLocation(self.unit.location.map_location(), \
                 self.unit.location.map_location().planet) #random.choice(self.directions)
                 if openNode is not None:
@@ -25,14 +25,7 @@ class Worker(IRobot):
                     if self.game_controller.can_replicate(self.unit.id, direction):
                         self.try_replication(direction)
             
-            #print("Worker bot with id {} run() called.".format(self.unit.id))
             self.update_mission()
-            
-            #if self.mission.action == Missions.Idle:
-            #    self.idle()
-
-            #if self.mission.action == Missions.RandomMovement:
-            #   self.one_random_movement()
 
             if self.mission.action == Missions.Mining:
                 self.one_random_movement()
@@ -52,35 +45,18 @@ class Worker(IRobot):
                 
                 # TODO Upgrade logic with better pathfinding
                 if can_afford:
-
-                    if not self.perform_second_action and self.target_location is None:
-                        if self.path == None or len(self.path) == 0:
-                            #print("Build location path is null. Making a new one.")
-                            #self.target_location = self.mission.info.map_location 
-                            newLocation = self.map_controller.GetRandomEarthNode()
-                            self.target_location = newLocation
-                            #print("Wants to move from {},{} to {},{}".format(\
-                            #self.unit.location.map_location().x, self.unit.location.map_location().y, \
-                            #self.target_location.x, self.target_location.y))
-                            self.update_path_to_target()
-                            
-
-                    if self.has_reached_destination():
-                        #self.one_random_movement()
-                        direction = random.choice(list(bc.Direction))
+                    direction = None
+                    openNode = self.pathfinding_controller.GetOpenNodeNextToLocation(self.unit.location.map_location(), \
+                    self.unit.location.map_location().planet) #random.choice(self.directions)
+                    if openNode is not None:
+                        direction = openNode.Action
                         if self.mission.info.isRocket:
                             if self.try_blueprint(bc.UnitType.Rocket, direction):
                                 print("Worker {} created blueprint for Rocket.".format(self.unit.id))
-                            else:
-                                self.one_random_movement()
+
                         else:
                             if self.try_blueprint(bc.UnitType.Factory, direction):
                                 print("Worker {} created blueprint for Factory.".format(self.unit.id))
-                            else:
-                                self.one_random_movement()
-                        #self.reset_mission()
-                    else:
-                        self.follow_path()
             elif self.mission.action == Missions.Build:
                 #if self.mission.info.unit.structure_is_built():
                 unit = self.game_controller.unit(self.mission.info.unit_id)
