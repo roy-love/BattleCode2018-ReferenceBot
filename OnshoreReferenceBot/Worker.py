@@ -18,7 +18,7 @@ class Worker(IRobot):
     def run(self):
         if not self.unit.location.is_in_garrison() and not self.unit.location.is_in_space():
             if self.unit_controller.workerCount < 10:
-                openNode = self.pathfinding_controller.GetOpenNodeNextToMe(self.unit.location.map_location(), \
+                openNode = self.pathfinding_controller.GetOpenNodeNextToLocation(self.unit.location.map_location(), \
                 self.unit.location.map_location().planet) #random.choice(self.directions)
                 if openNode is not None:
                     direction = openNode.Action

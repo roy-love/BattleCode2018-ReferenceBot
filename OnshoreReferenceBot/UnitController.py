@@ -128,21 +128,7 @@ class UnitController:
         #robot specific mission assignment.
         #structures create their own build missions
 
-        if self.is_rocket_researched() and self.rocketCount == 0 and \
-             self.game_controller.karbonite() > bc.UnitType.Rocket.blueprint_cost():
-                #if self.game_controller.round() > 95 and self.game_controller.round() < 101:
-            robot = random.choice(self.robots)
-            location = self.mapController.GetRandomEarthNode()
-            if robot.mission is None or robot.mission.action != Missions.Build:
-                robot.mission = self.mission_controller.CreateRocketBlueprintMission(location)
-                self.mission_controller.MustBuildRocket = True
 
-        elif self.factoryCount < 3 \
-         and self.game_controller.karbonite() >= bc.UnitType.Factory.blueprint_cost():
-            robot = random.choice(self.robots)
-            location = self.mapController.GetRandomEarthNode()
-            if robot.mission is None or robot.mission.action != Missions.Build:
-                robot.mission = self.mission_controller.CreateFactoryBlueprintMission(location)
 
 
         #print("GC.Units {}, UC.Robots+Structures {}".format(gc_count, robot_count+structure_count))
@@ -163,3 +149,10 @@ class UnitController:
             return True
         else:
             return False
+    
+    def get_workers(self):
+        workers = []
+        for robot in self.robots:
+            if robot.type == bc.UnitType.Worker:
+                workers.append(robot)
+        return workers

@@ -41,10 +41,6 @@ class PathfindingController:
 		node = GraphNode(startingLocation, None, None)
 		#creates the ending GraphNode
 		endNode = GraphNode(endingLocation, None, None)
-		#Create the list of nodes that will be blocked by units
-		# blockedLocations = []
-		#Get all visible units on the map
-		units = self.gameController.units()
 		#Interate through the units
 		self.PopulateBlockedLocations()
 		#add the starting node to the frontier so we know where to start from
@@ -183,7 +179,7 @@ class PathfindingController:
 			#Added nodes with units to the list of blocked nodes
 			self.blockedLocations.append(self.mapController.GetNode(unitMapLoc.planet, unitMapLoc.x, unitMapLoc.y))
 
-	def GetOpenNodeNextToMe(self, currentLocation, planet):
+	def GetOpenNodeNextToLocation(self, currentLocation, planet):
 		currentNode = self.mapController.GetNode(planet, currentLocation.x, currentLocation.y)
 		node = GraphNode(currentNode, None, None)
 		# Get all surrounding nodes

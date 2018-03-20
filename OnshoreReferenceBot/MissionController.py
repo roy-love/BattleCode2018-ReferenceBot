@@ -63,7 +63,8 @@ class MissionController:
         self.factory_missions = []
         self.rocket_missions = []
 
-        self.rocketCount = 0
+        self.rocket_count = 0
+        self.factory_count = 0
         self.MustBuildRocket = False
         self.structureNeedsBuild = False
 
@@ -145,7 +146,7 @@ class MissionController:
         #map_location = bc.MapLocation(self.game_controller.planet(), 0, 0)
         #map_location.x = random.randint(0, 12)
         #map_location.y = random.randint(0, 12)
-        new_mission.info.map_location = location # TODO get open location from the map
+        # new_mission.info.map_location = location # TODO get open location from the map
         
         return new_mission
 
@@ -157,7 +158,7 @@ class MissionController:
        # map_location = bc.MapLocation(self.game_controller.planet(), 0, 0)
        # map_location.x = random.randint(0, 12)
         #map_location.y = random.randint(0, 12)
-        new_mission.info.map_location = location # TODO get open location from the map
+        # new_mission.info.map_location = location # TODO get open location from the map
         #self.rocketCount += 1
         self.MustBuildRocket = False
         return new_mission
@@ -168,15 +169,21 @@ class MissionController:
 
     def __create_new_worker_mission__(self):
         #Determine what mission to assign based on the current strategy
-        if True: #self.strategy_controller.unitStrategy == UnitStrategies.Default:
+        new_mission = None
+        # This should be handled by the mission class
+        if self.is_rocket_researched() and self.rocket_count < 5 and self.game_controller.karbonite() > bc.UnitType.Rocket.blueprint_cost():
+            self.rocket_count += 1
+            location = self.map_controller.GetRandomEarthNode()
+            new_mission = self.CreateRocketBlueprintMission(location)
+            self.MustBuildRocket = True
 
+        elif self.factory_count < 3 and self.game_controller.karbonite() >= bc.UnitType.Factory.blueprint_cost():
+            self.factory_count +=1
+            new_mission = self.CreateFactoryBlueprintMission(location)
+        else :
             #Mine Karbonite
             new_mission = Mission()
             new_mission.action = Missions.Mining
-            map_location = bc.MapLocation(self.game_controller.planet(), 0, 0)
-            map_location.x = random.randint(0, 10)
-            map_location.y = random.randint(0, 10)
-            new_mission.info = map_location # TODO get mining location from map
             return new_mission
 
     # def __create_new_healer_mission__(self):
@@ -245,8 +252,7 @@ class MissionController:
         #    new_mission.action = Missions.TrainBot
         #    new_mission.info = bc.UnitType.Healer
         #    return new_mission
-        if not self.MustBuildRocket and \
-        self.game_controller.karbonite() >= bc.UnitType.Ranger.factory_cost():
+        if not self.MustBuildRocket and self.game_controller.karbonite() >= bc.UnitType.Ranger.factory_cost():
             new_mission = Mission()
             new_mission.action = Missions.TrainBot
             new_mission.info = bc.UnitType.Ranger
@@ -283,3 +289,11 @@ class MissionController:
                 new_mission = Mission()
                 new_mission.action = Missions.Idle
                 return new_mission
+
+    def is_rocket_researched(self):
+        research_info = self.game_controller.research_info()
+        level = research_info.get_level(bc.UnitType.Rocket)
+        if level > 0:
+            return True
+        else:
+            return False
