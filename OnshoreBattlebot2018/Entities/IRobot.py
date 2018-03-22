@@ -2,7 +2,7 @@ import battlecode as bc
 import random
 import sys
 import traceback
-from MissionController import *
+from Controllers.MissionController import *
 
 class IRobot:
     """This is the IRobot"""
@@ -49,9 +49,9 @@ class IRobot:
             self.mission = self.mission_controller.get_mission(self.unit_type)
             self.mission_start_round = self.game_controller.round()
             self.target_location = None
-            # if not self.mission.action == Missions.Mining:
-            #     print("Robot with id {} obtaining new mission {}".\
-            #     format(self.unit.id, self.mission.action))
+            if not self.mission.action == Missions.Mining:
+                print("Robot with id {} obtaining new mission {}".\
+                format(self.unit.id, self.mission.action))
 
     def reset_mission(self):
         """This resets the mission"""
@@ -62,13 +62,11 @@ class IRobot:
     def update_path_to_target(self):
         """This updates path to target"""
         if not self.unit.location.is_in_garrison() and self.target_location is not None and (self.path is None or len(self.path) == 0):
-            print("Creating new path from {}, {},{} to {},{}".format\
-            (self.unit.location.map_location().planet, self.unit.location.map_location().x, self.unit.location.map_location().y, \
+            print("Creating new path from {},{} to {},{}".format\
+            (self.unit.location.map_location().x, self.unit.location.map_location().y, \
             self.target_location.x, self.target_location.y))
             self.path = self.pathfinding_controller.FindPathTo(\
             self.unit.location.map_location().planet, self.unit.location.map_location(), self.target_location)
-            # print("printing path")
-            # print(self.path)
 
     def follow_path(self):
         """Allows you to follow the path"""
@@ -84,7 +82,6 @@ class IRobot:
             else:
                 #print("Robot {} path length 0.".format(self.unit.id))
                 pass
-                
     def isStuck(self):
         if self.lastPosition is None:
             self.lastPosition = self.unit.location.map_location()

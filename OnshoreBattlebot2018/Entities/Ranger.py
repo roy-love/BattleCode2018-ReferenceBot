@@ -2,77 +2,51 @@ import random
 import sys
 import traceback
 import battlecode as bc
-from MissionController import *
-from IRobot import IRobot
+from Controllers.MissionController import *
+from .IRobot import IRobot
 
 class Ranger(IRobot):
 	"""This is the Ranger robot"""
 	# change init definition to include any controllers needed in the instructor as we need them
 	# For example:  it will eventually need to access the Targeting and Pathfinding controllers
-	def __init__(self, gameController, unit_controller, pathfindingController, missionController, unit, mapController):
-		super().__init__(gameController, unit_controller, pathfindingController, missionController, unit, bc.UnitType.Ranger, mapController)
-		self.target_number = 1
-
+	def __init__(self, gameController, unitController, \
+	pathfindingController, missionController, unit, mapController):
+		super().__init__(gameController, unitController, \
+		pathfindingController, missionController, unit, bc.UnitType.Ranger,mapController)
 
 	def run(self):
-		if (not self.unit.location.is_in_garrison() and not self.unit.location.is_in_space()):
-			# self.update_mission()
-			# print("Running Ranger")
+		if not self.unit.location.is_in_garrison() and not self.unit.location.is_in_space():
+			self.update_mission()
 			#First priority is to kill enemy troops
-			# if not self.mission is None:
-			# 	if self.mission.action == Missions.Idle:
-			# 		self.idle()
+			if not self.mission is None:
+				if self.mission.action == Missions.Idle:
+					self.idle()
 
-				# elif self.mission.action == Missions.RandomMovement:
-				# 	self.one_random_movement()
+				elif self.mission.action == Missions.RandomMovement:
+					self.one_random_movement()
 
-				# elif self.mission.action == Missions.DestroyTarget:
-				# 	self.destroy_target()
+				elif self.mission.action == Missions.DestroyTarget:
+					self.destroy_target()
 
 				#Attacks nearby units
-			enemies = []
-			nearby = self.game_controller.sense_nearby_units(self.unit.location.map_location(), 50)
-			# print("Getting Enemys")
-			for other in nearby:
-				if other.team != self.game_controller.team():
-					enemies.append(other)
-			if (len(enemies) != 0 and self.game_controller.is_attack_ready(self.unit.id) 
-				and self.game_controller.can_attack(self.unit.id, enemies[0].id)):
-					print('Ranger {} attacked a thing!'.format(self.unit.id))
-					self.game_controller.attack(self.unit.id, enemies[0].id)
-			else:
-				if self.target_location is None:
-					# print("Setting Target Location")
-					self.target_location = random.choice(self.map_controller.enemy_team_start)
-				if self.path is None:
-					# print("Getting path to target")
-					self.update_path_to_target()
-				if self.path is not None:
-					if len(self.path) == 0:
-						self.path = None
-						self.target_location = self.map_controller.GetRandomEarthNode()
-					else:
-						# print("Following path")
-						self.follow_path()
-			
-			#self.update_path_to_target()
-			# if self.has_reached_destination:
-			# 	try:
-			# 		self.target_location = self.map_controller.enemy_team_start[self.target_number]
-			# 	except:
-			# 		print("ran out of targets")
-			# 		self.target_location = self.map_controller.GetRandomEarthNode()
-
+				nearby = self.game_controller.sense_nearby_units(self.unit.location.map_location(), 50)
+				for other in nearby:
+					if other.team != self.game_controller.team() \
+					and self.game_controller.is_attack_ready(self.unit.id) \
+					and self.game_controller.can_attack(self.unit.id, other.id):
+						print('Ranger {} attacked a thing!'.format(self.unit.id))
+						self.game_controller.attack(self.unit.id, other.id)
+						break
 
 	def try_attack(self, target_robot_id):
 		"""Trys to attack"""
 		# Checks to see if Ranger has enough heat to attack
 		if not self.game_controller.is_attack_ready(self.unit.id):
-			# print("Ranger[{}] attack is not ready. Not enough heat".format(self.unit.id))
+			print("Ranger[{}] attack is not ready. Not enough heat".format(self.unit.id))
 			return False
 
 		if not self.game_controller.can_attack(self.unit.id, target_robot_id):
-			# print("Ranger [{}] cannot attack the target [{}]".format(self.unit.id, target_robot_id))
+			print("Ranger [{}] cannot attack the target [{}]".format(self.unit.id, target_robot_id))
 			return False
 
 		self.game_controller.attack(self.unit.id, target_robot_id)
@@ -86,11 +60,11 @@ class Ranger(IRobot):
 			return False
 
 		if not self.game_controller.is_begin_snipe_ready(self.unit.id):
-			# print("Snipe is not ready for ranger [{}]".format(self.unit.id))
+			print("Snipe is not ready for ranger [{}]".format(self.unit.id))
 			return False
 
 		if not self.game_controller.can_begin_snipe(self.unit.id, target_location):
-			# print("Ranger [{}] cannot snipe target location".format(self.unit.id))
+			print("Ranger [{}] cannot snipe target location".format(self.unit.id))
 			return False
 
 		self.game_controller.begin_snipe(self.unit.id, target_location)
@@ -98,8 +72,8 @@ class Ranger(IRobot):
 
 	# Sends Rangers to a defensive waypoint between our starting location and the enemy starting location
 	def SetDefenderWaypoint(self):
-		currentLocation = self.map_controller.my_team_start
-		enemyDirection = currentLocation.direction_to(self.map_controller.enemy_team_start[0])
+		currentLocation = mapController.my_team_start
+		enemyDirection = currentLocation.direction_to(mapController.enemy_team_start[0])
 		target_location = currentLocation.clone()
 
 		for i in range (0, 9):
@@ -128,5 +102,5 @@ class Ranger(IRobot):
 		target_location.y = target_location.y + offset
 		# Assisgns target location for our rangers to defend
 		self.target_location = bc.MapLocation(bc.Planet.Earth, target_location.x, target_location.y)
-		enemyDirection = currentLocation.direction_to(self.target_location)
+		enemyDirection = direction_to(self.target_location)
 		self.try_move(enemyDirection)

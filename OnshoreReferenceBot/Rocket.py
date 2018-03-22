@@ -16,50 +16,50 @@ class Rocket(IStructure):
         self.rocketLauchRound = 0
 
     def run(self):
-
-        if self.game_controller.planet() == bc.Planet.Earth and \
-        self.unit.structure_is_built():
-        
-            team = self.game_controller.team()
-            robots = self.game_controller.sense_nearby_units_by_team(self.unit.location.map_location(),2,team)
-            for robot in robots:
-                print("Rocket cycle robot: {}".format(robot.id))
-                #unit = self.game_controller.unit(robot)
-                if robot.unit_type != bc.UnitType.Factory and robot.unit_type != bc.UnitType.Rocket:
-                    if self.try_load(robot.id):
-                        print("Rocket {} loaded robot {}.".format(self.unit.id,robot.id))
-                        if len(self.unit.structure_garrison()) > 0: #== #self.unit.structure_max_capacity():
-                            print("Rocket max capacity reached. Forcing rocket lauch.")
-                            #self.ForceLauch()
-                            location = self.mission_controller.GetMarsLocation()
-                            if self.try_launch(location):
-                                print("Rocket {} LAUNCHED!".format(self.unit.id))
-                        # elif len(self.unit.structure_garrision()) == self.expectedLoad):
-                        #    print("Rocket expected capacity reached.")
-                        else:
-                            currentLoad = len(self.unit.structure_garrison())
-                            maxCapacity = self.unit.structure_max_capacity()
-                            print("Rocket load success. Capacity: {}/{}".format(currentLoad,maxCapacity))
-            else:
-                print("Unable to load rocket {}".format(self.unit.id))
-        elif self.game_controller.planet() == bc.Planet.Mars: # planet is mars
-            garrison = self.unit.structure_garrison()
-            if self.try_unload(garrison[0]):
-                # print("Rocket {} unloaded unit with id {}".format(self.unit.id,self.mission.info.unitId))
-                currentLoad = len(garrison)
-                if currentLoad > 0:
-                    currentLoad = len(garrison)
-                    maxCapacity = self.unit.structure_max_capacity()
-                    print("Rocket {} unload success. Capacity: {}/{}".format(self.unit.id,currentLoad,maxCapacity))
+        if (not self.unit.location.is_in_garrison() and not self.unit.location.is_in_space()):
+            if self.game_controller.planet() == bc.Planet.Earth and \
+            self.unit.structure_is_built():
+            
+                team = self.game_controller.team()
+                robots = self.game_controller.sense_nearby_units_by_team(self.unit.location.map_location(),2,team)
+                for robot in robots:
+                    print("Rocket cycle robot: {}".format(robot.id))
+                    #unit = self.game_controller.unit(robot)
+                    if robot.unit_type != bc.UnitType.Factory and robot.unit_type != bc.UnitType.Rocket:
+                        if self.try_load(robot.id):
+                            print("Rocket {} loaded robot {}.".format(self.unit.id,robot.id))
+                            if len(self.unit.structure_garrison()) > 0: #== #self.unit.structure_max_capacity():
+                                print("Rocket max capacity reached. Forcing rocket lauch.")
+                                #self.ForceLauch()
+                                location = self.mission_controller.GetMarsLocation()
+                                if self.try_launch(location):
+                                    print("Rocket {} LAUNCHED!".format(self.unit.id))
+                            # elif len(self.unit.structure_garrision()) == self.expectedLoad):
+                            #    print("Rocket expected capacity reached.")
+                            else:
+                                currentLoad = len(self.unit.structure_garrison())
+                                maxCapacity = self.unit.structure_max_capacity()
+                                print("Rocket load success. Capacity: {}/{}".format(currentLoad,maxCapacity))
                 else:
-                    print("Rocket {} completely unloaded.".format(self.unit.id))
-                    newMission = Mission()
-                    newMission.action = Missions.Idle
-                    self.mission.Idle
-        else:
-            location = self.mission_controller.GetMarsLocation()
-            #if self.try_launch(location):
-             #   print("Rocket {} LAUNCHED!".format(self.unit.id))
+                    print("Unable to load rocket {}".format(self.unit.id))
+            elif self.game_controller.planet() == bc.Planet.Mars: # planet is mars
+                garrison = self.unit.structure_garrison()
+                if self.try_unload(garrison[0]):
+                    # print("Rocket {} unloaded unit with id {}".format(self.unit.id,self.mission.info.unitId))
+                    currentLoad = len(garrison)
+                    if currentLoad > 0:
+                        currentLoad = len(garrison)
+                        maxCapacity = self.unit.structure_max_capacity()
+                        print("Rocket {} unload success. Capacity: {}/{}".format(self.unit.id,currentLoad,maxCapacity))
+                    else:
+                        print("Rocket {} completely unloaded.".format(self.unit.id))
+                        newMission = Mission()
+                        newMission.action = Missions.Idle
+                        self.mission.Idle
+            else:
+                location = self.mission_controller.GetMarsLocation()
+                #if self.try_launch(location):
+                #   print("Rocket {} LAUNCHED!".format(self.unit.id))
        
 
     def ForceLauch(self):

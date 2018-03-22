@@ -1,22 +1,21 @@
 import battlecode as bc
 import random
-from Ranger import Ranger
-from Worker import Worker
-from Factory import Factory
-from Rocket import Rocket
-from MissionController import Missions
-
+from .MissionController import *
+from Entities import *
 # Keeps a list of all friendly units (share with buildController - figure out which should store it)
 # Loops over all units, running their "Run" methods one at a time
 # Can prioritize robots by importance or any other activation order
 # Responsible for putting robots back into the queue if a healer resets their cooldowns
 class UnitController:
     """This is the unit controller"""
-    def __init__(self, gameController, pathfindingController, missionController, mapController):
+    def __init__(self, gameController, strategyController, \
+    pathfindingController, missionController, mapController, researchTreeController):
         self.game_controller = gameController
+        self.strategy_controller = strategyController
         self.pathfinding_controller = pathfindingController
-        self.mapController = mapController
         self.mission_controller = missionController
+        self.mapController = mapController
+        self.researchTreeController = researchTreeController
 
         self.robots = []
         self.structures = []
@@ -31,6 +30,13 @@ class UnitController:
         self.__delete_killed_units()
         self.__add_unregistered_units()
         
+        
+
+        
+        
+
+        
+
     def UpdateRobotCounts(self):
         self.workerCount = 0
         for robot in self.robots:
@@ -94,24 +100,27 @@ class UnitController:
                         self.__register_unit(unit)
 
     def __register_unit(self, unit):
-        # if unit.unit_type == bc.UnitType.Healer:
-        #     self.robots.append(Healer(self.game_controller, \
-        #     self, self.pathfinding_controller, unit, self.mapController))
-        # elif unit.unit_type == bc.UnitType.Knight:
-        #     self.robots.append(Knight(self.game_controller, \
-        #     self, self.pathfinding_controller, unit, self.mapController))
-        # elif unit.unit_type == bc.UnitType.Mage:
-        #     self.robots.append(Mage(self.game_controller, \
-        #     self, self.pathfinding_controller, unit, self.mapController))
-        if unit.unit_type == bc.UnitType.Ranger:
-            self.robots.append(Ranger(self.game_controller, self, self.pathfinding_controller, self.mission_controller, unit, self.mapController))
+        if unit.unit_type == bc.UnitType.Healer:
+            self.robots.append(Healer(self.game_controller, \
+            self, self.pathfinding_controller, self.mission_controller, unit, self.mapController))
+        elif unit.unit_type == bc.UnitType.Knight:
+            self.robots.append(Knight(self.game_controller, \
+            self, self.pathfinding_controller, self.mission_controller, unit, self.mapController))
+        elif unit.unit_type == bc.UnitType.Mage:
+            self.robots.append(Mage(self.game_controller, \
+            self, self.pathfinding_controller, self.mission_controller, unit, self.mapController))
+        elif unit.unit_type == bc.UnitType.Ranger:
+            self.robots.append(Ranger(self.game_controller, \
+            self, self.pathfinding_controller, self.mission_controller, unit, self.mapController))
         elif unit.unit_type == bc.UnitType.Worker:
-            self.robots.append(Worker(self.game_controller, self, self.pathfinding_controller, self.mission_controller, unit, self.mapController))
+            self.robots.append(Worker(self.game_controller, \
+            self, self.pathfinding_controller, self.mission_controller, unit, self.mapController))
 
         elif unit.unit_type == bc.UnitType.Factory:
-            self.structures.append(Factory(self.game_controller, self, unit, self.mission_controller))
+            self.structures.append(Factory(self.game_controller, \
+            self, unit, self.mission_controller))
         elif unit.unit_type == bc.UnitType.Rocket:
-            self.structures.append(Rocket(self.game_controller, self, unit, self.mission_controller))
+            self.structures.append(Rocket(self.game_controller, self, unit,self.mission_controller))
         else:
             print("ERROR - Attempting to register an unknown unit type [{}]".format(unit.unit_type))
 
@@ -128,36 +137,30 @@ class UnitController:
         #robot specific mission assignment.
         #structures create their own build missions
 
+        if self.researchTreeController.is_rocket_researched() and self.rocketCount == 0 and \
+             self.game_controller.karbonite() > bc.UnitType.Rocket.blueprint_cost():
+                #if self.game_controller.round() > 95 and self.game_controller.round() < 101:
+            robot = random.choice(self.robots)
+            location = self.mapController.GetRandomEarthNode()
+            if robot.mission is None or robot.mission.action != Missions.Build:
+                robot.mission = self.mission_controller.CreateRocketBlueprintMission(location)
+                self.mission_controller.MustBuildRocket = True
 
+        elif self.factoryCount < 3 \
+         and self.game_controller.karbonite() >= bc.UnitType.Factory.blueprint_cost():
+            robot = random.choice(self.robots)
+            location = self.mapController.GetRandomEarthNode()
+            if robot.mission is None or robot.mission.action != Missions.Build:
+                robot.mission = self.mission_controller.CreateFactoryBlueprintMission(location)
 
 
         #print("GC.Units {}, UC.Robots+Structures {}".format(gc_count, robot_count+structure_count))
         #print("Running all structures")
         #print("structures count: {}".format(structure_count))
         for structure in self.structures:
-            try:
-                structure.run()
-            except:
-                print("ran into errors running structures")
+            structure.run()
 
         #print("Running all robots")
         #print("robot count: {}".format(robot_count))
         for robot in self.robots:
-            # try:
             robot.run()
-            # except:
-            #     print("ran into errors running robots")
-    def is_rocket_researched(self):
-        research_info = self.game_controller.research_info()
-        level = research_info.get_level(bc.UnitType.Rocket)
-        if level > 0:
-            return True
-        else:
-            return False
-    
-    def get_workers(self):
-        workers = []
-        for robot in self.robots:
-            if robot.type == bc.UnitType.Worker:
-                workers.append(robot)
-        return workers

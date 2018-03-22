@@ -66,9 +66,9 @@ class MapController:
                   traceback.print_exc()
                   
       def hashCoordinates(self, inX, inY):
-            hash = 5915587277
-            hash = 1500450271 * hash + inX
-            hash = 1500450271 * hash + inY
+            hash = 23
+            hash = 29 * hash + inX
+            hash = 29 * hash + inY
             return hash
 
       def GetNode(self, planet, mapX, mapY):
@@ -109,4 +109,3 @@ class MapController:
                   node = self.mars_map[mapX][mapY]
                   return node
             return None
-

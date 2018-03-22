@@ -42,7 +42,7 @@ class RunEarth:
     # Runs once per turn for this planet only
     def Run(self):
         """This runs on Earth once per turn"""
-        print("Karbonite: {}".format(self.game_controller.karbonite()))
+        # print("Karbonite: {}".format(self.game_controller.karbonite()))
         self.round = self.game_controller.round()
         if self.round == 1:
             print("First round on Earth.  Initializing map")
@@ -51,8 +51,9 @@ class RunEarth:
             self.map_controller.InitializeMarsMap()
 
         else:
-            print("Round {}".format(self.round))
-            print("Processing Left {}".format(self.game_controller.get_time_left_ms()))
+            if self.round % 10 == 0:
+                print("Round {}".format(self.round))
+                print("Processing Left {}".format(self.game_controller.get_time_left_ms()))
 
         #print("Update research queue")
         # self.research_tree_controller.update_queue()
@@ -61,7 +62,7 @@ class RunEarth:
         self.unit_controller.update_units()
 
         #print("Running all units")
-        try:
-            self.unit_controller.run_units()
-        except:
-            print("ran into error while running units")
+        # try:
+        self.unit_controller.run_units()
+        # except:
+        #     print("ran into error while running units")
