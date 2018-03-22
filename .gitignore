@@ -6,3 +6,4 @@ viewer_currentInstall.json
 .pyc
 .log
 battlecode/python/battlecode/__pycache__/__init__.cpython-36.pyc
+logs.txt
